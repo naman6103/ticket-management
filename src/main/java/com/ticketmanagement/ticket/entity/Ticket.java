@@ -51,6 +51,9 @@ public class Ticket {
   @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
 
+  @Column(name = "knowledge_indexed", nullable = false)
+  private boolean knowledgeIndexed = false;
+
   protected Ticket() {
     // JPA
   }
@@ -134,5 +137,19 @@ public class Ticket {
 
   public Instant getUpdatedAt() {
     return updatedAt;
+  }
+
+  /**
+   * Returns whether this ticket's knowledge documents have ever been successfully embedded/chunked
+   * into the RAG knowledge base (feature 003-rag-ticket-qa, FR-018). {@code true} means "indexed at
+   * least once," not "currently fresh" — later content edits are re-ingested without resetting this
+   * flag.
+   */
+  public boolean isKnowledgeIndexed() {
+    return knowledgeIndexed;
+  }
+
+  public void setKnowledgeIndexed(boolean knowledgeIndexed) {
+    this.knowledgeIndexed = knowledgeIndexed;
   }
 }

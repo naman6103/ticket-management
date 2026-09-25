@@ -1,0 +1,1 @@
+ALTER TABLE tickets ADD COLUMN knowledge_indexed BOOLEAN NOT NULL DEFAULT FALSE;

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.ticketmanagement.rag.exception.AiGenerationException;
+import com.ticketmanagement.rag.exception.AiRetrievalUnavailableException;
 import com.ticketmanagement.ticket.entity.TicketStatus;
 import com.ticketmanagement.ticket.exception.InvalidTransitionException;
 import com.ticketmanagement.ticket.exception.TicketNotFoundException;
@@ -72,6 +74,24 @@ class GlobalExceptionHandlerTest {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody().code()).isEqualTo("UNKNOWN_FILTER");
+  }
+
+  @Test
+  void mapsAiGenerationFailureTo502() {
+    ResponseEntity<ErrorResponse> response = handler.handleAiGenerationFailed(
+        new AiGenerationException("chat model timed out", new RuntimeException()), request);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
+    assertThat(response.getBody().code()).isEqualTo("AI_GENERATION_FAILED");
+  }
+
+  @Test
+  void mapsAiRetrievalUnavailableTo503() {
+    ResponseEntity<ErrorResponse> response = handler.handleAiRetrievalUnavailable(
+        new AiRetrievalUnavailableException("vector store unreachable", new RuntimeException()), request);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+    assertThat(response.getBody().code()).isEqualTo("AI_RETRIEVAL_UNAVAILABLE");
   }
 
   /** Supplies a real {@link Method} so a real {@link MethodParameter} can be constructed for the test above. */

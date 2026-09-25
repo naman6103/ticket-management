@@ -4,3 +4,13 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  elasticsearch:
+    uris: ${SPRING_ELASTICSEARCH_URIS}
+  ai:
+    ollama:
+      base-url: ${SPRING_AI_OLLAMA_BASE_URL}
+      init:
+        pull-model-strategy: when_missing
+    vectorstore:
+      elasticsearch:
+        initialize-schema: true

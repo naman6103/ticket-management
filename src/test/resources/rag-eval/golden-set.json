@@ -1,0 +1,47 @@
+[
+  {
+    "question": "Have we seen payment failures before?",
+    "expectedTicketKeys": ["T1", "T2"],
+    "type": "topical"
+  },
+  {
+    "question": "What are common causes of payment processing issues?",
+    "expectedTicketKeys": ["T1", "T2", "T3"],
+    "type": "topical"
+  },
+  {
+    "question": "What are the common causes of shipment tracking issues?",
+    "expectedTicketKeys": ["T4", "T5"],
+    "type": "topical"
+  },
+  {
+    "question": "What was the resolution for ticket {{T1}}?",
+    "expectedTicketKeys": ["T1"],
+    "type": "specific-ticket"
+  },
+  {
+    "question": "What was the resolution for ticket {{T2}}?",
+    "expectedTicketKeys": ["T2"],
+    "type": "specific-ticket"
+  },
+  {
+    "question": "What caused the satellite launch to be delayed?",
+    "expectedTicketKeys": [],
+    "type": "no-match"
+  },
+  {
+    "question": "How do we configure the office coffee machine?",
+    "expectedTicketKeys": [],
+    "type": "no-match"
+  },
+  {
+    "question": "Are there any known issues with employee onboarding paperwork?",
+    "expectedTicketKeys": [],
+    "type": "low-similarity"
+  },
+  {
+    "question": "What browser was the customer using during the payment gateway timeout?",
+    "expectedTicketKeys": ["T1"],
+    "type": "retrieved-but-insufficient"
+  }
+]

@@ -26,16 +26,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.context.ApplicationEventPublisher;
 
 class TicketServiceImplTest {
 
   private TicketRepository ticketRepository;
+  private ApplicationEventPublisher eventPublisher;
   private TicketServiceImpl service;
 
   @BeforeEach
   void setUp() {
     ticketRepository = mock(TicketRepository.class);
-    service = new TicketServiceImpl(ticketRepository);
+    eventPublisher = mock(ApplicationEventPublisher.class);
+    service = new TicketServiceImpl(ticketRepository, eventPublisher);
     when(ticketRepository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
   }
 

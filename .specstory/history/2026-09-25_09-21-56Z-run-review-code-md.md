@@ -21768,3 +21768,183 @@ hint: Turn this message off by running
 hint: "git config advice.addIgnoredFile false"
 ```
 </details></tool-use>
+
+_**Agent (claude-sonnet-5 2026-09-25 11:44:52Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+```bash
+cd "/home/naman/Projects/Demo/C2 Certification/ticket-management" && git add -A && git status --short | wc -l
+git diff --cached --stat | tail -5
+```
+
+```text
+90
+ .../ticket/integration/CommentIntegrationTest.java |    19 +
+ .../RestartPersistenceIntegrationTest.java         |     2 +-
+ .../ticket/service/CommentServiceImplTest.java     |    14 +
+ .../ticket/service/TicketServiceImplTest.java      |    19 +
+ 90 files changed, 33580 insertions(+), 4 deletions(-)
+```
+</details></tool-use>
+
+_**Agent (claude-sonnet-5 2026-09-25 11:44:54Z)**_
+
+Quick sanity check before committing — scan staged diff for anything secret-looking.
+
+_**Agent (claude-sonnet-5 2026-09-25 11:44:57Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+```bash
+cd "/home/naman/Projects/Demo/C2 Certification/ticket-management" && git diff --cached --name-only | grep -iE "\.env$|secret|credential"
+echo "---"
+git diff --cached | grep -iE "password\s*=\s*['\"][^'\"]|api[_-]?key\s*=\s*['\"][^'\"]" | grep -v "rejectedValue\|MYSQL_PASSWORD:\|SPRING_DATASOURCE_PASSWORD" | head -20
+```
+
+```text
+---
+```
+</details></tool-use>
+
+_**Agent (claude-sonnet-5 2026-09-25 11:44:59Z)**_
+
+Clean — nothing suspicious. Committing.
+
+_**Agent (claude-sonnet-5 2026-09-25 11:45:06Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+```bash
+cd "/home/naman/Projects/Demo/C2 Certification/ticket-management" && git commit -m "$(cat <<'EOF'
+Add Ticket Management Web UI (Feature 2), fix comment ordering, add assignees endpoint
+
+Frontend: Next.js/TypeScript UI consuming Feature 1's API via a server-side
+backend-for-frontend proxy (Route Handlers) — ticket list with infinite
+scroll/search/filter, create/edit forms, assignee combobox, comment
+history + composer, status transition controls, and a shared error-display
+component mapping backend ErrorResponse shapes to UI messages. Styled with
+a Jira-inspired theme (global stylesheet, color-coded status pills).
+
+Backend: new read-only GET /api/v1/assignees endpoint (distinct assignee
+values across tickets), a narrow scoped exception to this feature's
+frontend-only boundary. Fixed a real ordering bug found via live testing:
+CommentRepository.findByTicketId had no ORDER BY and created_at was
+second-precision, so rapid comments could return in arbitrary order —
+added explicit ordering and widened the column to TIMESTAMP(6). Also
+carries an earlier Feature 1 fix: reject unrecognized ticket list query
+parameters instead of silently ignoring them.
+
+Deployment: frontend Dockerfile (multi-stage, non-root) and a new
+docker-compose frontend service reaching the backend via its compose
+service name over a server-side-only env var (browsers can't resolve
+compose DNS names).
+
+Docs: spec.md/plan.md/tasks.md/architecture.md for 002-ticket-management-ui,
+including the UX requirements-quality checklist and the visual-design
+clarification for the Jira-inspired theme.
+
+Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+EOF
+)"
+```
+
+```text
+[002-ticket-management-ui 7e4390c] Add Ticket Management Web UI (Feature 2), fix comment ordering, add assignees endpoint
+ 90 files changed, 33580 insertions(+), 4 deletions(-)
+ create mode 100644 .specstory/history/2026-09-25_09-21-56Z-run-review-code-md.md
+ create mode 100644 frontend/.dockerignore
+ create mode 100644 frontend/.eslintrc.json
+ create mode 100644 frontend/.prettierignore
+ create mode 100644 frontend/.prettierrc
+ create mode 100644 frontend/Dockerfile
+ create mode 100644 frontend/next.config.mjs
+ create mode 100644 frontend/package-lock.json
+ create mode 100644 frontend/package.json
+ create mode 100644 frontend/playwright.config.ts
+ create mode 100644 frontend/public/.gitkeep
+ create mode 100644 frontend/src/app/api/assignees/route.ts
+ create mode 100644 frontend/src/app/api/tickets/[id]/comments/route.ts
+ create mode 100644 frontend/src/app/api/tickets/[id]/route.ts
+ create mode 100644 frontend/src/app/api/tickets/[id]/transitions/route.ts
+ create mode 100644 frontend/src/app/api/tickets/route.ts
+ create mode 100644 frontend/src/app/globals.css
+ create mode 100644 frontend/src/app/layout.tsx
+ create mode 100644 frontend/src/app/page.tsx
+ create mode 100644 frontend/src/app/tickets/[id]/page.tsx
+ create mode 100644 frontend/src/app/tickets/new/page.tsx
+ create mode 100644 frontend/src/app/tickets/page.tsx
+ create mode 100644 frontend/src/components/comments/CommentForm.tsx
+ create mode 100644 frontend/src/components/comments/CommentList.tsx
+ create mode 100644 frontend/src/components/errors/ErrorDisplay.tsx
+ create mode 100644 frontend/src/components/layout/NavShell.tsx
+ create mode 100644 frontend/src/components/layout/PageErrorBoundary.tsx
+ create mode 100644 frontend/src/components/layout/Providers.tsx
+ create mode 100644 frontend/src/components/tickets/AssigneeCombobox.tsx
+ create mode 100644 frontend/src/components/tickets/SearchFilterBar.tsx
+ create mode 100644 frontend/src/components/tickets/StatusBadge.tsx
+ create mode 100644 frontend/src/components/tickets/TicketDetail.tsx
+ create mode 100644 frontend/src/components/tickets/TicketForm.tsx
+ create mode 100644 frontend/src/components/tickets/TicketList.tsx
+ create mode 100644 frontend/src/components/tickets/TicketRow.tsx
+ create mode 100644 frontend/src/components/tickets/TransitionControl.tsx
+ create mode 100644 frontend/src/lib/api/assignees.ts
+ create mode 100644 frontend/src/lib/api/browserFetch.ts
+ create mode 100644 frontend/src/lib/api/client.ts
+ create mode 100644 frontend/src/lib/api/comments.ts
+ create mode 100644 frontend/src/lib/api/relay.ts
+ create mode 100644 frontend/src/lib/api/tickets.ts
+ create mode 100644 frontend/src/lib/errors/mapApiError.ts
+ create mode 100644 frontend/src/lib/transitions.ts
+ create mode 100644 frontend/src/types/apiError.ts
+ create mode 100644 frontend/src/types/assignee.ts
+ create mode 100644 frontend/src/types/comment.ts
+ create mode 100644 frontend/src/types/page.ts
+ create mode 100644 frontend/src/types/ticket.ts
+ create mode 100644 frontend/tests/components/AssigneeCombobox.test.tsx
+ create mode 100644 frontend/tests/components/CommentForm.test.tsx
+ create mode 100644 frontend/tests/components/CommentList.test.tsx
+ create mode 100644 frontend/tests/components/ErrorDisplay.test.tsx
+ create mode 100644 frontend/tests/components/TicketDetail.test.tsx
+ create mode 100644 frontend/tests/components/TicketForm.test.tsx
+ create mode 100644 frontend/tests/components/TicketList.test.tsx
+ create mode 100644 frontend/tests/components/TransitionControl.test.tsx
+ create mode 100644 frontend/tests/e2e/create-edit-transition.spec.ts
+ create mode 100644 frontend/tests/setup.ts
+ create mode 100644 frontend/tsconfig.json
+ create mode 100644 frontend/vitest.config.ts
+ create mode 100644 specs/002-ticket-management-ui/architecture.md
+ create mode 100644 specs/002-ticket-management-ui/checklists/requirements.md
+ create mode 100644 specs/002-ticket-management-ui/checklists/ux.md
+ create mode 100644 specs/002-ticket-management-ui/contracts/consumed-api.md
+ create mode 100644 specs/002-ticket-management-ui/data-model.md
+ create mode 100644 specs/002-ticket-management-ui/plan.md
+ create mode 100644 specs/002-ticket-management-ui/quickstart.md
+ create mode 100644 specs/002-ticket-management-ui/research.md
+ create mode 100644 specs/002-ticket-management-ui/spec.md
+ create mode 100644 specs/002-ticket-management-ui/tasks.md
+ create mode 100644 specs/002-ticket-management-ui/test-strategy.md
+ create mode 100644 specs/002-ticket-management-ui/ui-flow.md
+ create mode 100644 src/main/java/com/ticketmanagement/ticket/controller/AssigneeController.java
+ create mode 100644 src/main/java/com/ticketmanagement/ticket/dto/AssigneesResponse.java
+```
+</details></tool-use>
+
+_**Agent (claude-sonnet-5 2026-09-25 11:45:10Z)**_
+
+<tool-use data-tool-type="shell" data-tool-name="Bash"><details>
+<summary>Tool use: **Bash**</summary>
+
+`cd "/home/naman/Projects/Demo/C2 Certification/ticket-management" && git status --short`
+
+```text
+ M .specstory/history/2026-09-25_09-21-56Z-run-review-code-md.md
+```
+</details></tool-use>
+
+_**Agent (claude-sonnet-5 2026-09-25 11:45:14Z)**_
+
+Committed on branch `002-ticket-management-ui` (7e4390c): 90 files, 33580 insertions. Working tree clean except one auto-generated `.specstory` session-log file that changed after the commit (harmless conversation tracking, not code) — left it uncommitted unless you want it included too.

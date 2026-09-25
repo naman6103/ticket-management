@@ -1,5 +1,7 @@
 package com.ticketmanagement.common.exception;
 
+import com.ticketmanagement.rag.exception.AiGenerationException;
+import com.ticketmanagement.rag.exception.AiRetrievalUnavailableException;
 import com.ticketmanagement.ticket.exception.InvalidTransitionException;
 import com.ticketmanagement.ticket.exception.TicketNotFoundException;
 import com.ticketmanagement.ticket.exception.UnknownFilterException;
@@ -74,6 +76,19 @@ public class GlobalExceptionHandler {
       UnknownFilterException ex, HttpServletRequest request) {
     ErrorResponse.FieldDetail detail = new ErrorResponse.FieldDetail(ex.getField(), null, ex.getMessage());
     return build(HttpStatus.BAD_REQUEST, ErrorCode.UNKNOWN_FILTER, ex.getMessage(), request, List.of(detail));
+  }
+
+  @ExceptionHandler(AiGenerationException.class)
+  public ResponseEntity<ErrorResponse> handleAiGenerationFailed(
+      AiGenerationException ex, HttpServletRequest request) {
+    return build(HttpStatus.BAD_GATEWAY, ErrorCode.AI_GENERATION_FAILED, ex.getMessage(), request, List.of());
+  }
+
+  @ExceptionHandler(AiRetrievalUnavailableException.class)
+  public ResponseEntity<ErrorResponse> handleAiRetrievalUnavailable(
+      AiRetrievalUnavailableException ex, HttpServletRequest request) {
+    return build(
+        HttpStatus.SERVICE_UNAVAILABLE, ErrorCode.AI_RETRIEVAL_UNAVAILABLE, ex.getMessage(), request, List.of());
   }
 
   private ResponseEntity<ErrorResponse> build(

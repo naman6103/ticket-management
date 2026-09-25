@@ -2,6 +2,7 @@ package com.ticketmanagement.ticket.service;
 
 import com.ticketmanagement.common.exception.ErrorResponse;
 import com.ticketmanagement.common.exception.FieldValidationException;
+import com.ticketmanagement.rag.event.TicketChangedEvent;
 import com.ticketmanagement.ticket.dto.TicketCreateRequest;
 import com.ticketmanagement.ticket.dto.TicketUpdateRequest;
 import com.ticketmanagement.ticket.entity.Ticket;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,16 +37,20 @@ public class TicketServiceImpl implements TicketService {
   }
 
   private final TicketRepository ticketRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
-  public TicketServiceImpl(TicketRepository ticketRepository) {
+  public TicketServiceImpl(TicketRepository ticketRepository, ApplicationEventPublisher eventPublisher) {
     this.ticketRepository = ticketRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
   public Ticket create(TicketCreateRequest request) {
     Ticket ticket = new Ticket(
         request.title(), request.description(), request.priority(), request.assignee(), request.category());
-    return ticketRepository.save(ticket);
+    Ticket saved = ticketRepository.save(ticket);
+    eventPublisher.publishEvent(new TicketChangedEvent(saved.getId()));
+    return saved;
   }
 
   @Override
@@ -71,7 +77,9 @@ public class TicketServiceImpl implements TicketService {
     if (request.category() != null) {
       ticket.setCategory(request.category());
     }
-    return ticketRepository.save(ticket);
+    Ticket saved = ticketRepository.save(ticket);
+    eventPublisher.publishEvent(new TicketChangedEvent(saved.getId()));
+    return saved;
   }
 
   private void validatePresentFieldsNotBlank(TicketUpdateRequest request) {
@@ -98,7 +106,9 @@ public class TicketServiceImpl implements TicketService {
       throw new InvalidTransitionException(current, targetStatus);
     }
     ticket.setStatus(targetStatus);
-    return ticketRepository.save(ticket);
+    Ticket saved = ticketRepository.save(ticket);
+    eventPublisher.publishEvent(new TicketChangedEvent(saved.getId()));
+    return saved;
   }
 
   @Override

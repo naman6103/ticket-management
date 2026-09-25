@@ -14,16 +14,52 @@ services:
       timeout: 5s
       retries: 10
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.20
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    # No host port mapping: the app reaches this container over the internal
+    # Compose network only (http://ollama:11434). Many dev machines already
+    # run a native Ollama install on host port 11434 — exposing the same port
+    # here would collide with that instead of adding useful access.
+
   app:
     build: .
     depends_on:
       mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
     ports:
       - "${APP_PORT:-8080}:8080"
 
@@ -42,3 +78,5 @@ services:
 
 volumes:
   mysql-data:
+  elasticsearch-data:
+  ollama-data:
