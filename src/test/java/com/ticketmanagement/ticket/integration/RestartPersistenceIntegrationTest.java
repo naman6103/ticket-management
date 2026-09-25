@@ -42,7 +42,7 @@ class RestartPersistenceIntegrationTest {
 
       Ticket reloaded = ticketRepository.findById(ticketId).orElseThrow();
       assertThat(reloaded.getTitle()).isEqualTo("Persist me");
-      assertThat(commentRepository.findByTicketId(ticketId)).hasSize(1);
+      assertThat(commentRepository.findByTicketIdOrderByCreatedAtAscIdAsc(ticketId)).hasSize(1);
     }
   }
 

@@ -17,6 +17,7 @@ import com.ticketmanagement.ticket.exception.InvalidTransitionException;
 import com.ticketmanagement.ticket.exception.TicketNotFoundException;
 import com.ticketmanagement.ticket.repository.TicketRepository;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -133,5 +134,23 @@ class TicketServiceImplTest {
 
   private static boolean isValid(TicketStatus from, TicketStatus to) {
     return validTransitions().anyMatch(a -> a.get()[0] == from && a.get()[1] == to);
+  }
+
+  @Test
+  void listDistinctAssigneesReturnsRepositoryResult() {
+    when(ticketRepository.findDistinctAssignees()).thenReturn(List.of("jane.doe", "john.smith"));
+
+    List<String> result = service.listDistinctAssignees();
+
+    assertThat(result).containsExactly("jane.doe", "john.smith");
+  }
+
+  @Test
+  void listDistinctAssigneesReturnsEmptyListWhenNoTicketsHaveAssignees() {
+    when(ticketRepository.findDistinctAssignees()).thenReturn(List.of());
+
+    List<String> result = service.listDistinctAssignees();
+
+    assertThat(result).isEmpty();
   }
 }

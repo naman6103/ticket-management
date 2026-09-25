@@ -45,6 +45,25 @@ class CommentIntegrationTest {
   }
 
   @Test
+  void commentsReturnedInChronologicalOrder() throws Exception {
+    String location = createTicket();
+
+    mockMvc.perform(post(location + "/comments").contentType(MediaType.APPLICATION_JSON)
+        .content("{\"content\":\"First\"}"));
+    mockMvc.perform(post(location + "/comments").contentType(MediaType.APPLICATION_JSON)
+        .content("{\"content\":\"Second\"}"));
+    mockMvc.perform(post(location + "/comments").contentType(MediaType.APPLICATION_JSON)
+        .content("{\"content\":\"Third\"}"));
+
+    mockMvc.perform(get(location))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.comments.length()").value(3))
+        .andExpect(jsonPath("$.comments[0].content").value("First"))
+        .andExpect(jsonPath("$.comments[1].content").value("Second"))
+        .andExpect(jsonPath("$.comments[2].content").value("Third"));
+  }
+
+  @Test
   void blankCommentRejected() throws Exception {
     String location = createTicket();
 

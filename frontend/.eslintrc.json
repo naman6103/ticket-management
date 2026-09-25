@@ -1,0 +1,6 @@
+{
+  "root": true,
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "ignorePatterns": ["node_modules/", ".next/", "dist/", "playwright-report/", "test-results/"]
+}

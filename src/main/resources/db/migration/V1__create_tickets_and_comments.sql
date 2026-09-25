@@ -14,7 +14,7 @@ CREATE TABLE comments (
     id VARCHAR(36) PRIMARY KEY,
     ticket_id VARCHAR(36) NOT NULL REFERENCES tickets (id),
     content TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP(6) NOT NULL
 );
 
 CREATE INDEX idx_comments_ticket_id ON comments (ticket_id);

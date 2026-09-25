@@ -13,6 +13,7 @@ import com.ticketmanagement.ticket.entity.Comment;
 import com.ticketmanagement.ticket.exception.TicketNotFoundException;
 import com.ticketmanagement.ticket.repository.CommentRepository;
 import com.ticketmanagement.ticket.repository.TicketRepository;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,5 +52,18 @@ class CommentServiceImplTest {
         .isInstanceOf(TicketNotFoundException.class);
 
     verify(commentRepository, never()).save(any());
+  }
+
+  @Test
+  void getByTicketIdReturnsRepositoryResultInChronologicalOrder() {
+    UUID ticketId = UUID.randomUUID();
+    Comment first = new Comment(ticketId, "first");
+    Comment second = new Comment(ticketId, "second");
+    when(commentRepository.findByTicketIdOrderByCreatedAtAscIdAsc(ticketId))
+        .thenReturn(List.of(first, second));
+
+    List<Comment> result = service.getByTicketId(ticketId);
+
+    assertThat(result).containsExactly(first, second);
   }
 }

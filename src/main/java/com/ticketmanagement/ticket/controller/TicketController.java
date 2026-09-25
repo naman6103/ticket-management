@@ -16,6 +16,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/tickets")
 @Validated
 public class TicketController {
+
+  private static final Set<String> ALLOWED_LIST_PARAMS = Set.of("q", "status", "page", "size");
 
   private final TicketService ticketService;
   private final CommentService commentService;
@@ -62,10 +66,12 @@ public class TicketController {
 
   @GetMapping
   public PageResponse<TicketResponse> list(
+      @RequestParam Map<String, String> queryParams,
       @RequestParam(required = false) String q,
       @RequestParam(required = false) String status,
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @RequestParam(required = false) @Min(1) Integer size) {
+    rejectUnknownFilters(queryParams);
     TicketStatus statusFilter = parseStatus(status);
     int effectiveSize = size == null ? paginationProperties.getDefaultSize() : Math.min(size, paginationProperties.getMaxSize());
     Page<Ticket> result = ticketService.search(q, statusFilter, PageRequest.of(page, effectiveSize));
@@ -83,6 +89,15 @@ public class TicketController {
   public TicketResponse transition(@PathVariable UUID id, @Valid @RequestBody TicketTransitionRequest request) {
     Ticket ticket = ticketService.transition(id, request.targetStatus());
     return TicketResponse.withoutComments(ticket);
+  }
+
+  private void rejectUnknownFilters(Map<String, String> queryParams) {
+    queryParams.keySet().stream()
+        .filter(key -> !ALLOWED_LIST_PARAMS.contains(key))
+        .findFirst()
+        .ifPresent(key -> {
+          throw new UnknownFilterException(key, "Unrecognized query parameter: " + key);
+        });
   }
 
   private TicketStatus parseStatus(String status) {
