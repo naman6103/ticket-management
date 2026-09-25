@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ticket-management
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+app:
+  pagination:
+    default-size: 20
+    max-size: 100
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
