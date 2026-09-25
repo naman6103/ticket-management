@@ -2,7 +2,9 @@ export type BackendApiErrorCode =
   | "VALIDATION_FAILED"
   | "TICKET_NOT_FOUND"
   | "INVALID_TRANSITION"
-  | "UNKNOWN_FILTER";
+  | "UNKNOWN_FILTER"
+  | "AI_GENERATION_FAILED"
+  | "AI_RETRIEVAL_UNAVAILABLE";
 
 /**
  * NETWORK_ERROR is not a backend code — it's synthesized client-side when a

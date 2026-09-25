@@ -45,6 +45,19 @@ export function mapApiError(error: ApiError): MappedMessage[] {
     case "UNKNOWN_FILTER":
       return [{ kind: "banner", text: error.message }];
 
+    case "AI_GENERATION_FAILED":
+      return [
+        { kind: "banner", text: "The assistant couldn't generate an answer. Please try again." },
+      ];
+
+    case "AI_RETRIEVAL_UNAVAILABLE":
+      return [
+        {
+          kind: "banner",
+          text: "The assistant is temporarily unavailable. Please try again shortly.",
+        },
+      ];
+
     case "NETWORK_ERROR":
     default:
       return [{ kind: "banner", text: error.message }];
