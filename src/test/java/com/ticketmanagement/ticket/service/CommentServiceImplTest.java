@@ -17,18 +17,21 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 class CommentServiceImplTest {
 
   private CommentRepository commentRepository;
   private TicketRepository ticketRepository;
+  private ApplicationEventPublisher eventPublisher;
   private CommentServiceImpl service;
 
   @BeforeEach
   void setUp() {
     commentRepository = mock(CommentRepository.class);
     ticketRepository = mock(TicketRepository.class);
-    service = new CommentServiceImpl(commentRepository, ticketRepository);
+    eventPublisher = mock(ApplicationEventPublisher.class);
+    service = new CommentServiceImpl(commentRepository, ticketRepository, eventPublisher);
   }
 
   @Test

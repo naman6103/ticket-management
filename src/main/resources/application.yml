@@ -7,6 +7,23 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  elasticsearch:
+    uris: http://localhost:9200
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.1:8b
+      embedding:
+        model: nomic-embed-text
+      init:
+        pull-model-strategy: never # overridden to when_missing in the docker profile
+    vectorstore:
+      elasticsearch:
+        index-name: ticket-knowledge
+        dimensions: 768
+        similarity: cosine
+        initialize-schema: false
 
 server:
   port: 8080
@@ -15,6 +32,16 @@ app:
   pagination:
     default-size: 20
     max-size: 100
+
+ai:
+  rag:
+    retrieval:
+      top-k: 5
+      similarity-threshold: 0.60 # tuned from 0.65 via RagRetrievalEvaluationRunner (T025); see evaluation-strategy.md §5
+    embedding-model: nomic-embed-text
+    chat-model: llama3.1:8b
+    backfill:
+      enabled: false # one-time opt-in: set true for a single run, then unset (FR-017)
 
 management:
   endpoints:

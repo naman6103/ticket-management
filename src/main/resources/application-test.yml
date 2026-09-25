@@ -4,3 +4,17 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
+  # No Spring AI autoconfiguration is excluded for this profile. OllamaChatModel,
+  # OllamaEmbeddingModel, and the Elasticsearch vector store `vectorStore` bean are all hard
+  # (non-optional) dependencies of production RAG services (AskServiceImpl,
+  # TicketIngestionServiceImpl) — excluding any one of them breaks full-context tests with a
+  # missing-bean error, not a graceful skip.
+  #
+  # This is safe without a reachable Ollama/Elasticsearch because bean *creation* never touches
+  # the network here:
+  #   - `ai.ollama.init.pull-model-strategy: never` (application.yml default) means Ollama
+  #     bean creation does not verify/pull models at startup.
+  #   - `spring.ai.vectorstore.elasticsearch.initialize-schema: false` (this profile) means the
+  #     vector store bean does not try to create/verify the index at startup.
+  # RAG-specific unit tests mock VectorStore/ChatClient directly rather than relying on a live
+  # backend (rules/testing.md).
