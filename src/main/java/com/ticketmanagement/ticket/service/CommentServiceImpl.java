@@ -31,6 +31,6 @@ public class CommentServiceImpl implements CommentService {
 
   @Override
   public List<Comment> getByTicketId(UUID ticketId) {
-    return commentRepository.findByTicketId(ticketId);
+    return commentRepository.findByTicketIdOrderByCreatedAtAscIdAsc(ticketId);
   }
 }

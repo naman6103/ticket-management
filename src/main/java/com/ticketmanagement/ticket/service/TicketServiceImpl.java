@@ -118,4 +118,9 @@ public class TicketServiceImpl implements TicketService {
     };
     return ticketRepository.findAll(spec, pageable);
   }
+
+  @Override
+  public List<String> listDistinctAssignees() {
+    return ticketRepository.findDistinctAssignees();
+  }
 }

@@ -27,5 +27,18 @@ services:
     ports:
       - "${APP_PORT:-8080}:8080"
 
+  frontend:
+    build: ./frontend
+    depends_on:
+      - app
+    environment:
+      # Server-side only (no NEXT_PUBLIC_ prefix): resolved by the Next.js
+      # server's own Route Handlers acting as a backend-for-frontend proxy.
+      # Uses the backend's Compose service name, not localhost — the browser
+      # never talks to this URL directly, only same-origin to the frontend.
+      API_BASE_URL: http://app:8080
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+
 volumes:
   mysql-data:
